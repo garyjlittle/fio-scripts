@@ -37,11 +37,21 @@ DIRECT=1
 # Take some parameters from the command line
 #
 #############################################################
+usage() {
+	printf "Usage: $0 -d <output directory> -f <file or device name> -h Get Help\n\n"
+}
 help() { 
-	printf "This script generates a set of fio files that can be used to generate IO across a range of working set sizes wss.  \n\nThe script creates fio files and places them in the directory specified by -d.  The fio files will run against the file/device specified by -f. \n\n -f "filename" which can be a file-system file or device file
-\n -d "directory" the output directory where the fio files will be written. \n\nAfter creating the fio files, the script run-cache--finder.sh can be run to execute the fio files in order\n\n"
+	printf "This script generates a set of fio files that can be used to generate IO across a \
+range of working set sizes wss.\n\n \
+-f "filename" which can be a file-system file or device file
+\n \
+-d "directory" the output directory where the fio files will be written. \n\n\
+After creating the fio files, the script run-cache-finder.sh can be run to execute the fio files in order\n\n"
 	exit 1
 }
+#Check for empty argument list
+[[ $# -eq 0 ]] && { usage ; exit 1; }
+
 while getopts ":f:d:h" Option
 do
     case $Option in
