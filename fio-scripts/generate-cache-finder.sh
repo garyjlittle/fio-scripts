@@ -1,4 +1,4 @@
-#!/usr/bin env bash
+#!/usr/bin/env bash
 
 ############################################################
 #
@@ -10,7 +10,7 @@ WSS_FULL=(8m 16m 32m 64m 128m 256m 512m 1g 2g 4g 8g 16g 32g 64g 128g 512g 1024g 
 WSS_SMALL=(8m 16m 32m 64m 128m 256m 512m 1g)
 WSS=${WSS_FULL[*]}
 #Define block sizes
-BS=64k
+BS=4k
 #Define queue depth
 IODEPTH=64
 #Define runtime per iteration
@@ -37,28 +37,43 @@ DIRECT=1
 # Take some parameters from the command line
 #
 #############################################################
-while getopts ":o:d:v" Option
+help() { 
+	printf "This script generates a set of fio files that can be used to generate IO across a range of working set sizes wss.  \n\nThe script creates fio files and places them in the directory specified by -d.  The fio files will run against the file/device specified by -f. \n\n -f "filename" which can be a file-system file or device file
+\n -d "directory" the output directory where the fio files will be written. \n\nAfter creating the fio files, the script run-cache--finder.sh can be run to execute the fio files in order\n\n"
+	exit 1
+}
+while getopts ":f:d:h" Option
 do
     case $Option in
-        o   )   OUTPUTDIR=$OPTARG ;;
-        d   )   DEVICE=$OPTARG ;;
-        v   )   VERBOSE=1 ;;
-        ?   )   echo "Unknown argument $OPTARG" ; exit ;;
+        d   )   OUTPUTDIR=$OPTARG ;;
+        f   )   DEVICE=$OPTARG ;;
+        h   )   help ;;
+	*   )   echo usage ;;
     esac
 done
-if [ ! -z $OUTPUTDIR  ]; then echo "The Destination is $OUTPUTDIR" ; fi
-if [ ! -z $DEVICE ]; then 
-    echo "The Device is $DEVICE" 
-else
+
+if [ -z $OUTPUTDIR  ]; then 
+    echo "The output directory is empty"
+    exit 1
+fi
+
+if [ -z $DEVICE ]; then 
    echo "No device given, bailing out"
    exit
 fi
 
-# Save current directory
-pushd .
-cd $OUTPUTDIR
-
+# Save current directory and change to the outputdirectory.
+pushd . >/dev/null
+if [[ -d $OUTPUTDIR ]] ; then
+	echo found directory $OUTPUTDIR
+	cd $OUTPUTDIR
+else
+	echo making directory $OUTPUTDIR
+	mkdir $OUTPUTDIR || exit 1
+fi
+let count=0
 for wss in ${WSS[@]}; do
+    ((count++))
     echo "
 [global]
 bs=$BS
@@ -73,8 +88,9 @@ random_distribution=$RANDOM_DISTRIBUTION
 [$RW-1]
 filename=$DEVICE
 size=$wss
-" > $BS-$RW-$wss-$IODEPTH"qd".fio
+" > $count-$BS-$RW-$wss-$IODEPTH"qd".fio
 done
 
 # Restore to previous directory
-popd
+popd > /dev/null
+echo fio files created in $OUTPUTDIR
