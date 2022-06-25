@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
 ############################################################
-#
 # Generate a set of scripts aimed at finding various caching
 # sizes using an increasing workingset size.  Based on ideas
 # in IOzone
-##############################################################
+############################################################
+#         Change these values to setup the experiment      # 
+############################################################
 WSS_FULL=(8m 16m 32m 64m 128m 256m 512m 1g 2g 4g 8g 16g 32g 64g 128g 512g 1024g 2048g 4192g)
 WSS_SMALL=(8m 16m 32m 64m 128m 256m 512m 1g)
 WSS=${WSS_FULL[*]}
-#Define block sizes
+#Define block sizes - can be overridden with -b switch.
 BS=4k
 #Define queue depth
 IODEPTH=64
@@ -18,11 +19,8 @@ RUNTIME=15s
 #Define RW pattern
 RW=randread
 
-
 #############################################################
-#
-# Normally wont need to change these
-#
+#        Normally wont need to change these                 #
 #############################################################
 #Define random style
 RANDOM_DISTRIBUTION=random
@@ -34,11 +32,46 @@ DIRECT=1
 
 #############################################################
 #
-# Take some parameters from the command line
+# Take some parameters from the command line.  Namely the
+# destination directory where the fio files will be written
+# to (-d) and the file/device under test (-f).  It is 
+# probably best to have the user specify the file on the 
+# command line to avoid accidentally overwriting a mounted
+# filesystem / device.
 #
 #############################################################
+write_fio_file() {
+	let count=0
+	for wss in ${WSS[@]}; do
+	    ((count++))
+	    echo "
+	[global]
+	bs=$BS
+	rw=$RW
+	iodepth=$IODEPTH
+	time_based
+	runtime=$RUNTIME
+	ioengine=$IOENGINE
+	direct=$DIRECT
+	random_distribution=$RANDOM_DISTRIBUTION
+
+	[$RW-1]
+	filename=$DEVICE
+	size=$wss
+	" > $count-$BS-$RW-$wss-$IODEPTH"qd".fio
+	done
+
+	# Restore to previous directory
+	popd > /dev/null
+	echo fio files created in $OUTPUTDIR
+}
+
+#############################################################
+# Create usage and help functions, also check for empty 
+# values for the required parameters (-d and -f)
+#############################################################
 usage() {
-	printf "Usage: $0 -d <output directory> -f <file or device name> -h Get Help\n\n"
+	printf "Usage: $0 -d <output directory> -f <file or device name> -b <blocksize> -h Get Help\n\n"
 }
 help() { 
 	printf "This script generates a set of fio files that can be used to generate IO across a \
@@ -46,17 +79,24 @@ range of working set sizes wss.\n\n \
 -f "filename" which can be a file-system file or device file
 \n \
 -d "directory" the output directory where the fio files will be written. \n\n\
-After creating the fio files, the script run-cache-finder.sh can be run to execute the fio files in order\n\n"
+After creating the fio files, the script run-cache-finder.sh can be run to execute the fio files in order\n\n
+\n\
+-b "blocksize" Blocksize passed to fio e.g. 8k or 1m \n\n"	
 	exit 1
 }
 #Check for empty argument list
 [[ $# -eq 0 ]] && { usage ; exit 1; }
 
-while getopts ":f:d:h" Option
+
+#############################################################
+# parse and validate command line options
+#############################################################
+while getopts ":f:d:b:h" Option
 do
     case $Option in
         d   )   OUTPUTDIR=$OPTARG ;;
         f   )   DEVICE=$OPTARG ;;
+        b   )   BS=$OPTARG ;;
         h   )   help ;;
 	*   )   echo usage ;;
     esac
@@ -80,27 +120,10 @@ if [[ -d $OUTPUTDIR ]] ; then
 else
 	echo making directory $OUTPUTDIR
 	mkdir $OUTPUTDIR || exit 1
+	cd $OUTPUTDIR
 fi
-let count=0
-for wss in ${WSS[@]}; do
-    ((count++))
-    echo "
-[global]
-bs=$BS
-rw=$RW
-iodepth=$IODEPTH
-time_based
-runtime=$RUNTIME
-ioengine=$IOENGINE
-direct=$DIRECT
-random_distribution=$RANDOM_DISTRIBUTION
-
-[$RW-1]
-filename=$DEVICE
-size=$wss
-" > $count-$BS-$RW-$wss-$IODEPTH"qd".fio
-done
-
-# Restore to previous directory
-popd > /dev/null
-echo fio files created in $OUTPUTDIR
+#############################################################
+# Finally do the work of creating the fio file and writing
+# it out to the requested directory for later use
+#############################################################
+write_fio_file
