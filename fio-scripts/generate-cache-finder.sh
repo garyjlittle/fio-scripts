@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -x
 
 ############################################################
 # Generate a set of scripts aimed at finding various caching
@@ -28,7 +28,6 @@ RANDOM_DISTRIBUTION=random
 IOENGINE=libaio
 #Define pagecache interaction
 DIRECT=1
-
 
 #############################################################
 # Main function that does the work of creating fio files in
@@ -60,6 +59,24 @@ write_fio_file() {
 	echo fio files created in $OUTPUTDIR
 }
 
+#############################################################
+# Gather information about the environment
+#############################################################
+write_environment() {
+echo OUTPUTDIR=$OUTPUTDIR
+ENVFILE=$OUTPUTDIR/environment
+HOSTNAME=$(hostname)
+DEVICETYPE=$(lsscsi | grep $DEVICE | awk '{for(i=3;i<=NF;++i)print $i}' | tr '\n' ' ')
+CPUTYPE=$(cat /proc/cpuinfo |grep "model name"|uniq)
+CPUCORES=$(cat /proc/cpuinfo |grep "cores"|uniq)
+OSVER=$(uname -rv)
+echo $HOSTNAME > $ENVFILE
+echo $DEVICETYPE >> $ENVFILE
+echo $CPUTYPE >> $ENVFILE
+echo $CPUCORES >> $ENVFILE
+echo $OSVER >> $ENVFILE
+echo $DEVICETYPE > $OUTPUTDIR/device
+}
 #############################################################
 # Create usage and help functions, also check for empty 
 # values for the required parameters (-d and -f)
@@ -123,6 +140,7 @@ if [[ -d $OUTPUTDIR ]] ; then
 	cd $OUTPUTDIR
 else
 	echo making directory $OUTPUTDIR
+	OUTPUTDIR=$OUTPUTDIR-wss-$(basename $DEVICE)-$BS-$IODEPTH
 	mkdir $OUTPUTDIR || exit 1
 	cd $OUTPUTDIR
 fi
@@ -131,3 +149,5 @@ fi
 # it out to the requested directory for later use
 #############################################################
 write_fio_file
+write_environment
+

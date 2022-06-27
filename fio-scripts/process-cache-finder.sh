@@ -15,15 +15,18 @@ do
         ?   )   echo "Unknown argument $OPTARG" ; exit ;;
     esac
 done
-if [ ! -z $OUTPUTDIR  ]; then echo "The Destination is $OUTPUTDIR" 
-else
+if [ -z $OUTPUTDIR  ] 
+then
 	echo "Need to use -d for output directory"
 	exit 1
 fi
 
-pushd .
+pushd . >/dev/null
 cd $OUTPUTDIR
 rm output_parsed
+echo "----------------------------------------------------------------------------"
+cat environment
+echo "----------------------------------------------------------------------------"
 printf "%-4s %-8s %-9s %-9s %-4s %-4s\n" bs  filesize iops   lat_ns usr sys 
 for json in $(ls *.fio.out.json|sort -n)
 do
@@ -39,8 +42,9 @@ do
     printf "%4s %-8s %1.0f %10.0f %4.0f %4.0f\n" $bs $filesize $iops_mean $clat_ns $usr_cpu $sys_cpu | tee -a output_parsed
 done
 # Generate little gnuplot script
+DEVICE=$(cat device)
 echo 'set terminal dumb' > plotfile.plt
-echo 'plot "output_parsed" using 3 with linespoints' >> plotfile.plt
+echo "plot 'output_parsed' using 3 with linespoints title \"$DEVICE\"" >> plotfile.plt
 gnuplot -p plotfile.plt
 popd
 
