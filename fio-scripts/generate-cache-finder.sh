@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bash -x
+#!/usr/bin/env -S bash 
 
 ############################################################
 # Generate a set of scripts aimed at finding various caching
@@ -7,9 +7,10 @@
 ############################################################
 #         Change these values to setup the experiment      # 
 ############################################################
+# ~~~ !!!1 WSS must be expressed in MB !!!! ~~~~~          #
 WSS_FULL=(8m 16m 32m 64m 128m 256m 512m 1g 2g 4g 8g 16g 32g 64g 128g 512g 1024g 2048g 4192g)
-WSS_SMALL=(8m 16m 32m 64m 128m 256m 512m 1g)
-WSS=${WSS_FULL[*]}
+WSS_SMALL=(8m 16m 32m 64m 128m 256m 512m 1024m 114479m)
+WSS=${WSS_SMALL[*]}
 #Define block sizes - can be overridden with -b switch.
 BS=4k
 #Define queue depth - can be overridden with -q switch 
@@ -78,6 +79,23 @@ echo $OSVER >> $ENVFILE
 echo $DEVICETYPE > $OUTPUTDIR/device
 }
 #############################################################
+# Get max size for this device
+#############################################################
+getdisksize() {
+DEVICEBYTES=$(lsblk -ib $DEVICE |grep $(basename $DEVICE)|head -1|awk '{ print $4 }')
+DEVICEMB=$( echo "$DEVICEBYTES / (1024*1024)" | bc)
+echo DEVICE in MB = $DEVICEMB
+}
+checksize() {
+        for wss in ${WSS[@]}; do
+		wss_mb=$(echo $wss | tr -d 'm')
+		if [ $wss_mb -gt $DEVICEMB ] ; then
+			echo "Configured WSS $wss is greater than Device size $DEVICEMB"
+			exit 1
+		fi
+	done
+}
+#############################################################
 # Create usage and help functions, also check for empty 
 # values for the required parameters (-d and -f)
 #############################################################
@@ -135,12 +153,12 @@ fi
 
 # Save current directory and change to the outputdirectory.
 pushd . >/dev/null
+OUTPUTDIR=$OUTPUTDIR-wss-$(basename $DEVICE)-$BS-$IODEPTH
 if [[ -d $OUTPUTDIR ]] ; then
 	echo found directory $OUTPUTDIR
 	cd $OUTPUTDIR
 else
 	echo making directory $OUTPUTDIR
-	OUTPUTDIR=$OUTPUTDIR-wss-$(basename $DEVICE)-$BS-$IODEPTH
 	mkdir $OUTPUTDIR || exit 1
 	cd $OUTPUTDIR
 fi
@@ -148,6 +166,7 @@ fi
 # Finally do the work of creating the fio file and writing
 # it out to the requested directory for later use
 #############################################################
+getdisksize
+checksize
 write_fio_file
 write_environment
-
