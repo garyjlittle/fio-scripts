@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env  bash 
 
 ########################################################
 #
@@ -15,7 +15,11 @@ do
         ?   )   echo "Unknown argument $OPTARG" ; exit ;;
     esac
 done
-if [ ! -z $OUTPUTDIR  ]; then echo "The Destination is $OUTPUTDIR" ; fi
+if [ ! -z $OUTPUTDIR  ]; then echo "The Destination is $OUTPUTDIR" 
+else
+	echo "Need to use -d for output directory"
+	exit 1
+fi
 
 pushd .
 cd $OUTPUTDIR
