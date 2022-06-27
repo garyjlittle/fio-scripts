@@ -24,6 +24,7 @@ fi
 pushd .
 cd $OUTPUTDIR
 rm output_parsed
+printf "%-4s %-8s %-9s %-9s %-4s %-4s\n" bs  filesize iops   lat_ns usr sys 
 for json in $(ls *.fio.out.json|sort -n)
 do
     iops_mean=$(jq  '.["jobs"][0]["read"]["iops_mean"]' $json)
@@ -35,13 +36,11 @@ do
     iodepth=$(jq '.["global options"]["iodepth"]' $json)
     bs=$(jq '.["global options"]["bs"]' $json)
 
-    #echo json = $json $iops_mean $iops u:$usr_cpu s:$sys_cpu
-    #printf "%-45s : %1.0f  lat_ns=%5.2f u:%2.0f s:%2.0f\n" $json $iops_mean $clat_ns $usr_cpu $sys_cpu
-    printf "blocksize %4s filesize %-8s : iops %1.0f  lat_ns %5.2f usr %2.0f sys%2.0f\n" $bs $filesize $iops_mean $clat_ns $usr_cpu $sys_cpu | tee -a output_parsed
+    printf "%4s %-8s %1.0f %10.0f %4.0f %4.0f\n" $bs $filesize $iops_mean $clat_ns $usr_cpu $sys_cpu | tee -a output_parsed
 done
 # Generate little gnuplot script
 echo 'set terminal dumb' > plotfile.plt
-echo 'plot "output_parsed" using 7 with linespoints' >> plotfile.plt
+echo 'plot "output_parsed" using 3 with linespoints' >> plotfile.plt
 gnuplot -p plotfile.plt
 popd
 
