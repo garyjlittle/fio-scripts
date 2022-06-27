@@ -8,9 +8,9 @@
 #         Change these values to setup the experiment      # 
 ############################################################
 # ~~~ !!!1 WSS must be expressed in MB !!!! ~~~~~          #
-WSS_FULL=(8m 16m 32m 64m 128m 256m 512m 1g 2g 4g 8g 16g 32g 64g 128g 512g 1024g 2048g 4192g)
-WSS_SMALL=(8m 16m 32m 64m 128m 256m 512m 1024m 114479m)
-WSS=${WSS_SMALL[*]}
+WSS_8m_64g=(8m 16m 32m 64m 128m 256m 512m 1024m 2048m 4096m 8192m 16384m 32768m 65536m)
+WSS_8m_128g=(8m 16m 32m 64m 128m 256m 512m 1024m 2048m 4096m 8192m 16384m 32768m 65536m 131072m)
+WSS=${WSS_8m_64g[*]}
 #Define block sizes - can be overridden with -b switch.
 BS=4k
 #Define queue depth - can be overridden with -q switch 
