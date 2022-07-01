@@ -79,6 +79,37 @@ echo $OSVER >> $ENVFILE
 echo $DEVICETYPE > $OUTPUTDIR/device
 }
 #############################################################
+# Write out the WSS list for use as labels
+#############################################################
+write_wss_info() {
+ count=0
+ for wss in ${WSS[@]} ; do
+	 wss_mb=$(echo $wss | tr -d "m")
+	 echo wss_mb = $wss_mb
+	 if [ $wss_mb -ge 1024 ]; then
+		 wss_gb=$(echo "$wss_mb / 1024"|bc)
+		 echo "wss_gb = $wss_gb"
+		 wss=$wss_gb
+	 	 printf "%sg " $wss  >> $OUTPUTDIR/wss_list
+		 printf "\"%sg\" %d," $wss $count  >> $OUTPUTDIR/wss_list_gnuplot
+	 else 
+	 	 printf "%s " $wss  >> $OUTPUTDIR/wss_list
+		 printf "\"%s\" %d ," $wss $count  >> $OUTPUTDIR/wss_list_gnuplot
+	 fi
+	 ((count++))
+ done
+printf "\n" >> $OUTPUTDIR/wss_list 
+printf "\n" >> $OUTPUTDIR/wss_list_gnuplot
+wss_list_gnuplot=$(cat $OUTPUTDIR/wss_list_gnuplot)
+echo wss_list_gnuplot = $wss_list_gnuplot
+
+#printf "set xtics (%s)" $wss_list_gnuplot  >> $OUTPUTDIR/set_xtics.plt
+echo "set xtics ($wss_list_gnuplot)" >> $OUTPUTDIR/set_xtics.plt
+}
+
+
+
+#############################################################
 # Get max size for this device
 #############################################################
 getdisksize() {
@@ -156,6 +187,9 @@ pushd . >/dev/null
 OUTPUTDIR=$OUTPUTDIR-wss-$(basename $DEVICE)-$BS-$IODEPTH
 if [[ -d $OUTPUTDIR ]] ; then
 	echo found directory $OUTPUTDIR
+ 	if [[ -f wss_list ]] ; then rm wss_list ; fi
+ 	if [[ -f wss_list_gnuplot ]] ; then rm wss_list_gnuplot ; fi
+ 	if [[ -f set_xtics.plt ]] ; then rm set_xtics.plt ; fi
 	cd $OUTPUTDIR
 else
 	echo making directory $OUTPUTDIR
@@ -170,3 +204,4 @@ getdisksize
 checksize
 write_fio_file
 write_environment
+write_wss_info
