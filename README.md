@@ -1,7 +1,7 @@
 # fio-scripts
 * [Cache Finder](#cache-finder-scripts)
- * [Example](#cache-finder-example)
- * [Example-plot](#cache-finder-example-plot) 
+  * [Example](#cache-finder-example)
+  * [Example-plot](#cache-finder-example-plot) 
 ### Cache finder scripts
 These scripts use increasing WSS to find cache points.  The scripts are split like this
 
