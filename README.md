@@ -62,8 +62,9 @@ bs   filesize iops      lat_ns    usr  sys
         |         +        +         +        +    A****A****A***A****A    |
   16000 +------------------------------------------------------------------+
         0         2        4         6        8         10       12        14
-
-./plot-cache-finder.sh /tmp/dellboy-wss-nvme0n1-64k-64
+```
 #### cache-finder-example-plot
+```
+./plot-cache-finder.sh /tmp/dellboy-wss-nvme0n1-64k-64
 ```
 ![wss.png](https://github.com/garyjlittle/fio-scripts/blob/44eef08781dd17e46c1da559f38d9141020dcb5e/wss.png)
