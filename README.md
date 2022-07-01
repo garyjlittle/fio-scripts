@@ -1,4 +1,7 @@
 # fio-scripts
+* [Cache Finder](#cache-finder-scripts)
+ * [Example](#cache-finder-example)
+ * [Example-plot](#cache-finder-example-plot) 
 ### Cache finder scripts
 These scripts use increasing WSS to find cache points.  The scripts are split like this
 
@@ -7,7 +10,7 @@ These scripts use increasing WSS to find cache points.  The scripts are split li
 3. `process-cache-finder.sh` ; processes the output of fio (yaml) and prints a table of results
 4. `plot-cache-finder` ; invokes gnuplot to display results.  `plot-cache-finder` can accept multiple directories and will plot the data therein
 
-#### Example execution
+#### Cache Finder example
 ```
  ./generate-cache-finder.sh -d /tmp/dellboy -f /dev/nvme0n1 -b 64k -q 64
 sudo ./run-cache-finder.sh -d /tmp/dellboy-wss-nvme0n1-64k-64
@@ -61,5 +64,6 @@ bs   filesize iops      lat_ns    usr  sys
         0         2        4         6        8         10       12        14
 
 ./plot-cache-finder.sh /tmp/dellboy-wss-nvme0n1-64k-64
+#### cache-finder-example-plot
 ```
 ![wss.png](https://github.com/garyjlittle/fio-scripts/blob/44eef08781dd17e46c1da559f38d9141020dcb5e/wss.png)
