@@ -61,3 +61,4 @@ bs   filesize iops      lat_ns    usr  sys
         0         2        4         6        8         10       12        14
 
 ./plot-cache-finder.sh /tmp/dellboy-wss-nvme0n1-64k-64
+![wss.png](./wss.png)
