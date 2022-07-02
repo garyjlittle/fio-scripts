@@ -1,7 +1,9 @@
 # fio-scripts
 * [Cache Finder](#cache-finder-scripts)
   * [Example](#cache-finder-example)
-  * [Example-plot](#cache-finder-example-plot) 
+  * [Example plot](#cache-finder-example-plot) 
+  * [Example multiplot](#cache-finder-example-multiplot)
+  
 ### Cache finder scripts
 These scripts use increasing WSS to find cache points.  The scripts are split like this
 
@@ -68,3 +70,9 @@ bs   filesize iops      lat_ns    usr  sys
 ./plot-cache-finder.sh /tmp/dellboy-wss-nvme0n1-64k-64
 ```
 ![wss.png](https://github.com/garyjlittle/fio-scripts/blob/44eef08781dd17e46c1da559f38d9141020dcb5e/wss.png)
+
+#### cache-finder-example-multiplot
+```
+./plot-cache-finder.sh /tmp/plottest-wss-nvme0n1-4k-64/ /tmp/plottest-wss-sda-4k-64/ /tmp/plottest-wss-sdb-4k-64/p
+```
+![multiplot.png](multiplot.png)
