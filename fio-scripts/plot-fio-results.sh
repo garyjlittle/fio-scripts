@@ -4,8 +4,12 @@ RESDIR=$1
 RESDIR1=$1
 echo RESDIR = $RESDIR
 
-DEVICETYPE=$(cat $RESDIR\device)
-printf "set title \"Increasing WSS tests\"\n" > /tmp/plotfile.plt
+DEVICETYPE=$(cat $RESDIR/device)
+TITLE=$(cat $RESDIR/gnuplot_title)
+echo TITLE is $TITLE
+printf "set title \"$TITLE\"\n" > /tmp/plotfile.plt
+XAXIS_LABEL=$(cat $RESDIR/gnuplot_xlabel)
+printf "set xlabel \"$XAXIS_LABEL\"\n" >> /tmp/plotfile.plt
 printf "plot \"$RESDIR/output_parsed\" using 3 with linespoints title \"$DEVICETYPE\" " >> /tmp/plotfile.plt
 
 # If there is more than one directory/result to plot, then iterate though them and append to the plotfile
