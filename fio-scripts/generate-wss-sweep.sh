@@ -83,6 +83,8 @@ echo $DEVICETYPE > $OUTPUTDIR/device
 #############################################################
 write_wss_info() {
  count=0
+ rm $OUTPUTDIR/wss_list
+ rm $OUTPUTDIR/wss_list_gnuplot
  for wss in ${WSS[@]} ; do
 	 wss_mb=$(echo $wss | tr -d "m")
 	 echo wss_mb = $wss_mb
@@ -107,7 +109,13 @@ echo wss_list_gnuplot = $wss_list_gnuplot
 echo "set xtics ($wss_list_gnuplot)" >> $OUTPUTDIR/set_xtics.plt
 }
 
-
+#############################################################
+# Write out gnuplot text for this sweep type
+#############################################################
+write_gnuplot_text() {
+	echo "WSS sweep tests" > $OUTPUTDIR/gnuplot_title
+	echo "Working Set Size" > $OUTPUTDIR/gnuplot_xlabel
+}
 
 #############################################################
 # Get max size for this device
@@ -205,3 +213,9 @@ checksize
 write_fio_file
 write_environment
 write_wss_info
+write_gnuplot_text
+#############################################################
+# Do not remove this last echo statement it is used by the runsweep
+# script to determine the full output directory name.
+#############################################################
+echo $OUTPUTDIR
