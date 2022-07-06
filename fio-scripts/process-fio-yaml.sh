@@ -46,6 +46,7 @@ done
 # Generate little gnuplot script
 DEVICE=$(cat device)
 echo 'set terminal dumb' > plotfile.plt
+#cat set_xtics.plt plotfile.plot > plotfile.plt
 echo "plot 'output_parsed' using 3 with linespoints title \"$DEVICE\"" >> plotfile.plt
 gnuplot -p plotfile.plt
 popd
