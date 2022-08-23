@@ -5,6 +5,7 @@
 #
 # 1. Generate the fio files
 # 2. Execute the fio scripts
+# 3. Gather environment data (CPU, Instance Types, OS Version etc.)
 # 4. Process the results
 # 5. Plot the results
 ###############################################
