@@ -3,6 +3,7 @@
 ###############################################
 # Run the complete sweep process
 #
+# 0. Figure out device-type (e.g. Intel XYZ - from device file, or overrride (may be needed for e.g. EBS types)
 # 1. Generate the fio files
 # 2. Execute the fio scripts
 # 3. Gather environment data (CPU, Instance Types, OS Version etc.)
