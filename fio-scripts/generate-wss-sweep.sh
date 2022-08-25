@@ -144,13 +144,15 @@ usage() {
 help() { 
 	printf "\n\nThis script generates a set of fio files that can be used to generate IO across a \
 range of working set sizes wss.\n\n \
--f "filename" which can be a file-system file or device file
+-d "device" which can be a file-system file or device file
 \n \
--d "directory" the output directory where the fio files will be written.
+-o "output" the output directory where the fio files will be written.
 \n \
 -b "blocksize" Blocksize passed to fio e.g. 8k or 1m  default 4k
 \n \
 -q "queuedepth" (iodepth) passed to fio default 64 
+\n \
+-r "runtime" passed to fio as is.  e.g. use 60s for 60 seconds	
 \n \
 After creating the fio files, the script run-cache-finder.sh can be run to execute the fio files in order\n\n"
 	exit 1
@@ -168,13 +170,14 @@ After creating the fio files, the script run-cache-finder.sh can be run to execu
 # filesystem / device.
 #
 #############################################################
-while getopts ":f:d:b:h" Option
+while getopts ":f:d:b:r:h" Option
 do
     case $Option in
-        d   )   OUTPUTDIR=$OPTARG ;;
-        f   )   DEVICE=$OPTARG ;;
+        o   )   OUTPUTDIR=$OPTARG ;;
+        d   )   DEVICE=$OPTARG ;;
         b   )   BS=$OPTARG ;;
         q   )   IODEPTH=$OPTARG ;;
+	r   )   RUNTIME=$OPTARG ;;
         h   )   help ;;
 	*   )   echo usage ;;
     esac
@@ -192,7 +195,7 @@ fi
 
 # Save current directory and change to the outputdirectory.
 pushd . >/dev/null
-OUTPUTDIR=$OUTPUTDIR/wss_sweep-$(basename $DEVICE)-$BS-$IODEPTH
+OUTPUTDIR=$OUTPUTDIR/wss_sweep-$(basename $DEVICE)-$BS-$IODEPTH-$RUNTIME
 if [[ -d $OUTPUTDIR ]] ; then
 	echo found directory $OUTPUTDIR
  	if [[ -f wss_list ]] ; then rm wss_list ; fi
