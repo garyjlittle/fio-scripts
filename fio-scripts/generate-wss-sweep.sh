@@ -192,7 +192,7 @@ fi
 
 # Save current directory and change to the outputdirectory.
 pushd . >/dev/null
-OUTPUTDIR=$OUTPUTDIR-wss-$(basename $DEVICE)-$BS-$IODEPTH
+OUTPUTDIR=$OUTPUTDIR/wss_sweep-$(basename $DEVICE)-$BS-$IODEPTH
 if [[ -d $OUTPUTDIR ]] ; then
 	echo found directory $OUTPUTDIR
  	if [[ -f wss_list ]] ; then rm wss_list ; fi
