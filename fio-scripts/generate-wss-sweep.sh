@@ -170,7 +170,7 @@ After creating the fio files, the script run-cache-finder.sh can be run to execu
 # filesystem / device.
 #
 #############################################################
-while getopts ":f:d:b:r:h" Option
+while getopts ":o:d:b:r:h" Option
 do
     case $Option in
         o   )   OUTPUTDIR=$OPTARG ;;

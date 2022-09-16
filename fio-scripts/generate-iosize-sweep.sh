@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bash 
+#!/usr/bin/env -S bash -x
 
 ############################################################
 # Generate a set of scripts aimed at finding various caching
@@ -13,7 +13,7 @@ IOSIZE=${IO_SIZE[*]}
 #Define WSS sizes - can be overridden with -w switch.
 WSS=1G
 #Define queue depth - can be overridden with -q switch 
-IODEPTH=1
+IODEPTH=128
 #Define runtime per iteration
 RUNTIME=15s
 #Define RW pattern
@@ -25,7 +25,7 @@ RW=randread
 #Define random style
 RANDOM_DISTRIBUTION=random
 #Define IO Engine
-IOENGINE=sync
+IOENGINE=libaio
 #Define pagecache interaction
 DIRECT=1
 
@@ -194,7 +194,7 @@ fi
 
 # Save current directory and change to the outputdirectory.
 pushd . >/dev/null
-OUTPUTDIR=$OUTPUTDIR/wss_sweep-$(basename $DEVICE)-$BS-$IODEPTH-$RUNTIME
+OUTPUTDIR=$OUTPUTDIR/blocksize_sweep-$(basename $DEVICE)-$IOENGINE-$WSS-$IODEPTH-$RUNTIME
 if [[ -d $OUTPUTDIR ]] ; then
 	echo found directory $OUTPUTDIR
  	if [[ -f wss_list ]] ; then rm wss_list ; fi
@@ -203,7 +203,7 @@ if [[ -d $OUTPUTDIR ]] ; then
 	cd $OUTPUTDIR
 else
 	echo making directory $OUTPUTDIR
-	mkdir $OUTPUTDIR || exit 1
+	mkdir -p $OUTPUTDIR || exit 1
 	cd $OUTPUTDIR
 fi
 #############################################################
